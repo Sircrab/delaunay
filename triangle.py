@@ -1,11 +1,12 @@
 from point import Point
 from edge import Edge
+from operator import itemgetter,attrgetter, methodcaller
 
 class Triangle:
-    def __init__(self, points, triangles):
+    def __init__(self, points):
         'TODO: Ensure that the points are passed in CCW order, to do this'
         'sort the points based on x coordinate, if equal then by y coordinate'
-
+        points = ccwSort(points)
 
         # pointer to each point
         self.p1 = points[0]
@@ -17,30 +18,38 @@ class Triangle:
         self.e2 = Edge(self.p2,self.p3)
         self.e3 = Edge(self.p3,self.p1)
 
-        'TODO: Ensure that pointers to adjacent triangles are in correct order'
-        'that is, they match their corresponding edge inside the triangle.'
-
-        # pointer to each adjacent triangle
-        self.t1 = triangles[0]
-        self.t2 = triangles[1]
-        self.t3 = triangles[2]
-
     def show(self):
         return "(" + self.p1.show() + ", " + self.p2.show() + ", " + self.p3.show() + ")" 
 
-    'Input: point to check if its inside or out of this triangle, epsilon for orientation test'
-    'Output: This triangle if it contains the point or lies in one of its edges, closest adjacent triangle if it lies outside of it.'
-    def triangle_containing_point(self,point,eps):
-        #Orientation tests
+
+    def onEdge(self,point,eps):
         firstEdgeTest = self.e1.orientation_test(point,eps)
         secondEdgeTest = self.e2.orientation_test(point,eps)
         thirdEdgeTest = self.e3.orientation_test(point,eps)
-        if firstEdgeTest >= 0 and secondEdgeTest >= 0 and thirdEdgeTest >= 0:
-            return self
-        elif firstEdgeTest < 0:
-            return self.t1
-        elif secondEdgeTest < 0:
-            return self.t2
-        else:
-            return self.t3
+        if firstEdgeTest == 0:
+            return self.e1
+        if secondEdgeTest == 0:
+            return self.e2
+        if thirdEdgeTest == 0:
+            return self.e3
+        return None
+
+    def opposingVertex(self, edge):
+        if (edge == self.e1):
+            return self.p3
+        if (edge == self.e2):
+            return self.p1
+        if (edge == self.e3):
+            return self.p2
+        return None
+
+    def ccwSort(self,points):
+        center = Point((points[0].x + points[1].x + points[2].x)/3,(points[0].y + points[1].y + points[2].y)/3)
+        sortedPoints = []
+        for i in range(0,3):
+            ang = atan2(points[i].y - center.y,points[i].x - center.x)
+            sortedPoints.append((ang,points[0]))
+        sortedPoints.sort()
+        return [sortedPoints[0][1],sortedPoints[1][1],sortedPoints[2][1]]
+
 

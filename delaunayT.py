@@ -11,8 +11,7 @@ class DelaunayT(Triangulation):
     ' Initialize the Delaunay triangulation '
     def __init__(self, points):
         # set the initial triangle
-        self.triangles = [self.auxTriangle(points)]
-
+        addTriangle(self.triangles[0])
         # compute a random permutation of points
         random.shuffle(points)
 
@@ -40,16 +39,15 @@ class DelaunayT(Triangulation):
 
         # set the triangle
         vertexs = [p1, p2, p3]
-        neighbors = [None] * 3
         
-        return Triangle(vertexs, neighbors)
+        return Triangle(vertexs)
 
     ' POINT -> TRIANGLE '
     ' Find the triangle that contain a point in a triangulation'
     def findTriangle(self, point, eps):
         curTriangle = random.choice(self.triangles)
-        while(curTriangle != curTriangle.triangle_containing_point(point,eps) and curTriangle != None):
-            curTriangle = curTriangle.triangle_containing_point(point,eps)
+        while(curTriangle != triangle_containing_point(curTriangle,point,eps) and curTriangle != None):
+            curTriangle = triangle_containing_point(curTriangle,point,eps)
         if(curTriangle == None):
             raise NameError("Point lies outside any triangle")
         return curTriangle
@@ -61,10 +59,19 @@ class DelaunayT(Triangulation):
         eps = 0.00001
         if self.triangles:
             t = findTriangle(point,eps)
-            'TODO'
-            if (True):
+            auxEdge = t.onEdge(point,eps)
+            #point on edge!
+            if(auxEdge != None):
                 pass
+
             else:
-                pass
+                #3 new triangles
+                addTriangle(Triangle([t.p1,point,t.p2]))
+                addTriangle(Triangle([t.p2,point,t.p3]))
+                addTriangle(Triangle([t.p3,point,t.p1]))
+
+
+
+
         else:
             raise NameError("need at least one triangle")

@@ -25,6 +25,14 @@ class Edge:
 		else:
 			return -1
 
+	def getReverseEdge(self):
+		return Edge(self.second,self.first)
+
 	def show(self):
 		return '[ ' + self.first.show() + ', ' + self.second.show() + ']'
+
+	def __eq__(self,other):
+		if isinstance(other,Edge):
+			return self.first == other.first and self.second == other.second
+		return NotImplemented
 
