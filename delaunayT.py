@@ -62,13 +62,23 @@ class DelaunayT(Triangulation):
             auxEdge = t.onEdge(point,eps)
             #point on edge!
             if(auxEdge != None):
-                pass
-
+                reverseEdge = auxEdge.getReverseEdge()
+                t = getNeighbour(auxEdge)
+                t2 = getNeighbour(reverseEdge)
+                op1 = t.opposingVertex(reverseEdge)
+                op2 = t2.opposingVertex(auxEdge)
+                addTriangle(Triangle([reverseEdge.first,point,op1]))
+                addTriangle(Triangle(point,reverseEdge.second,op1))
+                addTriangle(Triangle(op2,auxEdge.first,point))
+                addTriangle(Triangle(point,auxEdge.second,op2))
             else:
                 #3 new triangles
                 addTriangle(Triangle([t.p1,point,t.p2]))
                 addTriangle(Triangle([t.p2,point,t.p3]))
                 addTriangle(Triangle([t.p3,point,t.p1]))
+
+            #Triangles added, now to check delaunay
+            
 
 
 

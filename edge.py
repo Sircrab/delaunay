@@ -10,7 +10,7 @@ class Edge:
 	'Output: Num'
 	#Determinant of edge against point, used for orientation test.
 	def det(self,point):
-		return (b.x - a.x)*(c.y - a.y) - (b.y - a.y)*(c.x - a.x)
+		return (self.first.x - point.x)*(second.y - point.y) - (self.first.y - point.y)*(self.second.x - point.x)
 
 
 	'Input: Point, Num'
