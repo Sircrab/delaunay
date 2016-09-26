@@ -14,6 +14,7 @@ class Triangulation:
     	self.halfEdges[e2] = tri
     	self.halfEdges[e3] = tri
     	self.triangles.append(tri)
+    	return tri
 
     #We don't need to erase edges because either other triangles will update those edges or they will never be called upon.
     def eraseTriangle(self,tri):

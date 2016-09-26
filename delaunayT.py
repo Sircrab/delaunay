@@ -1,6 +1,6 @@
 import random
+from collections import deque
 from operator import attrgetter
-
 from point import Point
 from triangle import Triangle
 from triangulation import Triangulation
@@ -45,6 +45,7 @@ class DelaunayT(Triangulation):
     ' POINT -> TRIANGLE '
     ' Find the triangle that contain a point in a triangulation'
     def findTriangle(self, point, eps):
+
         curTriangle = random.choice(self.triangles)
         while(curTriangle != triangle_containing_point(curTriangle,point,eps) and curTriangle != None):
             curTriangle = triangle_containing_point(curTriangle,point,eps)
@@ -61,23 +62,47 @@ class DelaunayT(Triangulation):
             t = findTriangle(point,eps)
             auxEdge = t.onEdge(point,eps)
             #point on edge!
+            q = deque()
             if(auxEdge != None):
+                eraseTriangle(t)
                 reverseEdge = auxEdge.getReverseEdge()
                 t = getNeighbour(auxEdge)
                 t2 = getNeighbour(reverseEdge)
                 op1 = t.opposingVertex(reverseEdge)
                 op2 = t2.opposingVertex(auxEdge)
-                addTriangle(Triangle([reverseEdge.first,point,op1]))
-                addTriangle(Triangle(point,reverseEdge.second,op1))
-                addTriangle(Triangle(op2,auxEdge.first,point))
-                addTriangle(Triangle(point,auxEdge.second,op2))
+                toAdd = addTriangle(Triangle([reverseEdge.first,point,op1]))
+                q.append(toAdd)
+                toAdd = addTriangle(Triangle(point,reverseEdge.second,op1))
+                q.append(toAdd)
+                toAdd = addTriangle(Triangle(op2,auxEdge.first,point))
+                q.append(toAdd)
+                toAdd = addTriangle(Triangle(point,auxEdge.second,op2))
+                q.append(toAdd)
             else:
-                #3 new triangles
-                addTriangle(Triangle([t.p1,point,t.p2]))
-                addTriangle(Triangle([t.p2,point,t.p3]))
-                addTriangle(Triangle([t.p3,point,t.p1]))
-
+                #3 new triangle
+                toAdd = addTriangle(Triangle([t.p1,point,t.p2]))
+                q.append(toAdd)
+                toAdd = addTriangle(Triangle([t.p2,point,t.p3]))
+                q.append(toAdd)
+                toAdd = addTriangle(Triangle([t.p3,point,t.p1]))
+                q.append(toAdd)
+                eraseTriangle(t)
             #Triangles added, now to check delaunay
+            visitedSet = set()
+            while q:
+                curTri = q.popLeft()
+                if curTri.circleTest(curTri.opposingVertex(curTri.e1),eps) > 0:
+                    pass
+                elif curTri.circleTest(curTri.opposingVertex(curTri.e2),eps) > 0:
+                    pass
+                elif curTri.circleTest(curTri.opposingVertex(curTri.e3),eps) > 0:
+                    pass
+                visitedSet.add(curTri)
+
+
+
+
+            
             
 
 
