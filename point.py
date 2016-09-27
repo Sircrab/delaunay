@@ -9,4 +9,10 @@ class Point:
     def __eq__(self,other):
     	if isinstance(other,Point):
     		return self.x == other.x and self.y == other.y
+    	if isinstance(other,tuple):
+    		return self.x == other[0] and self.y == other[1]
     	return NotImplemented
+    def __key(self):
+    	return (self.x,self.y)
+    def __hash__(self):
+    	return hash(self.__key())

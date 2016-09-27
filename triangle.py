@@ -1,12 +1,13 @@
 from point import Point
 from edge import Edge
+from math import *
 from operator import itemgetter,attrgetter, methodcaller
 
 class Triangle:
     def __init__(self, points):
         'TODO: Ensure that the points are passed in CCW order, to do this'
         'sort the points based on x coordinate, if equal then by y coordinate'
-        points = ccwSort(points)
+        points = self.ccwSort(points)
 
         # pointer to each point
         self.p1 = points[0]
@@ -48,7 +49,7 @@ class Triangle:
         sortedPoints = []
         for i in range(0,3):
             ang = atan2(points[i].y - center.y,points[i].x - center.x)
-            sortedPoints.append((ang,points[0]))
+            sortedPoints.append((ang,points[i]))
         sortedPoints.sort()
         return [sortedPoints[0][1],sortedPoints[1][1],sortedPoints[2][1]]
 
@@ -62,12 +63,12 @@ class Triangle:
         else:
             return int(det/abs(det))
 
-    def incircle(a, b, c, d, eps):
+    def incircle(self,a, b, c, d, eps):
         matrix = [[a.x, a.y, (a.x**2+a.y**2), 1],
                   [b.x, b.y, (b.x**2+b.y**2), 1],
                   [c.x, c.y, (c.x**2+c.y**2), 1],
                   [d.x, d.y, (d.x**2+d.y**2), 1]]
-        d = det(matrix, 1)
+        d = self.det(matrix, 1)
 
         if (abs(d) <= eps):
             return 0
@@ -75,9 +76,9 @@ class Triangle:
             return int(d/abs(d))
 
     def circleTest(self,point,eps):
-        return incircle(self.p1,self.p2,self.p3,point,eps)
+        return self.incircle(self.p1,self.p2,self.p3,point,eps)
 
-    def det(matrix, mul):
+    def det(self,matrix, mul):
         width = len(matrix)
         if width == 1:
             return mul * matrix[0][0]
@@ -93,7 +94,16 @@ class Triangle:
                             buff.append(matrix[j][k])
                     m.append(buff)
                 sign *= -1
-                total += mul * det(m, sign * matrix[0][i])
+                total += mul * self.det(m, sign * matrix[0][i])
             return total
+
+    def __eq__(self,other):
+        if isinstance(other,Triangle):
+            return self.p1 == other.p1 and self.p2 == other.p2 and self.p3 == other.p3
+        return NotImplemented
+    def __key(self):
+        return (self.p1,self.p2,self.p3)
+    def __hash__(self):
+        return hash(self.__key())
 
 

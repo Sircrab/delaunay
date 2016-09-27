@@ -10,14 +10,15 @@ class Edge:
 	'Output: Num'
 	#Determinant of edge against point, used for orientation test.
 	def det(self,point):
-		return (self.first.x - point.x)*(second.y - point.y) - (self.first.y - point.y)*(self.second.x - point.x)
+		return (self.first.x - point.x)*(self.second.y - point.y) - (self.first.y - point.y)*(self.second.x - point.x)
 
 
 	'Input: Point, Num'
 	'Output: 1 if the point is to the left of the edge, -1 if to the right, 0 if on the edge within epsilon value'
 	#Orientation test, checks Edge against point.
 	def orientation_test(self,point,eps):
-		val = det(point)
+		val = self.det(point)
+		#print(val)
 		if(abs(val) < eps):
 			return 0
 		elif val > eps:
@@ -35,4 +36,9 @@ class Edge:
 		if isinstance(other,Edge):
 			return self.first == other.first and self.second == other.second
 		return NotImplemented
+	def __key(self):
+		return (self.first,self.second)
+	def __hash__(self):
+		return hash(self.__key())
+
 
