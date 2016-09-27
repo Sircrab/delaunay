@@ -4,7 +4,7 @@ import random
 
 def main():
 	#delaunayTri = DelaunayT([Point(0,0)])
-	num = 100
+	num = 20
 	points = []
 	xRange = 1000
 	yRange = 1000

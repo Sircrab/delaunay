@@ -3,6 +3,38 @@ from edge import Edge
 
 from tkinter import *
 
+
+# Distance between points A and B
+def distance(A,B):
+	n = len(A)
+	assert len(B) == n
+	return sum((A[i]-B[i])**2 for i in range(n))**0.5
+
+def cosine(A,B,C):
+	a,b,c = distance(B,C), distance(A,C), distance(A,B)
+	return (a*a+c*c-b*b)/(2*a*c)
+
+def barycentric(A,B,C,p,q,r):
+	n = len(A)
+	assert len(B) == len(C) == n
+	s = p+q+r
+	p, q, r = p/s, q/s, r/s
+	return tuple([p*A[i]+q*B[i]+r*C[i] for i in range(n)])
+
+def trilinear(A,B,C,alpha,beta,gamma):
+	a = distance(B,C)
+	b = distance(A,C)
+	c = distance(A,B)
+	return barycentric(A,B,C,a*alpha,b*beta,c*gamma)
+
+def circumcenter(A,B,C):
+	cosA = cosine(C,A,B)
+	cosB = cosine(A,B,C)
+	cosC = cosine(B,C,A)
+	return trilinear(A,B,C,cosA,cosB,cosC)
+
+
+
 class Triangulation:
     def __init__(self):
         self.triangles = []
@@ -58,7 +90,7 @@ class Triangulation:
     	ydif = abs(self.miny-self.maxy)
     	return ((point.x - self.minx)/xdif*self.width,self.height-((point.y - self.miny)/ydif * self.height))
 
-    def draw(self,drawOrigLines):
+    def draw(self,drawOrigLines, drawCircs):
     	master = Tk()
     	self.width = 800
     	self.height = 800
@@ -69,27 +101,42 @@ class Triangulation:
     	self.maxx = -10000000000
     	self.miny = 10000000000
     	self.maxy = -10000000000
-
-    	for t in self.triangles:
-    		self.minx = min(t.p1.x,t.p2.x,t.p3.x,self.minx)
-    		self.maxx = max(t.p1.x,t.p2.x,t.p3.x,self.maxx)
-    		self.miny = min(t.p1.y,t.p2.y,t.p3.y,self.miny)
-    		self.maxy = max(t.p1.y,t.p2.y,t.p3.y,self.maxy)
     	origPointSet = set()
     	if self.origTriangle != None:
     		origPointSet.add(self.origTriangle.p1)
     		origPointSet.add(self.origTriangle.p2)
     		origPointSet.add(self.origTriangle.p3)
     	for t in self.triangles:
+    		if(t.p1 not in origPointSet and t.p2 not in origPointSet and t.p3 not in origPointSet):
+	    		self.minx = min(t.p1.x,t.p2.x,t.p3.x,self.minx)
+	    		self.maxx = max(t.p1.x,t.p2.x,t.p3.x,self.maxx)
+	    		self.miny = min(t.p1.y,t.p2.y,t.p3.y,self.miny)
+	    		self.maxy = max(t.p1.y,t.p2.y,t.p3.y,self.maxy)
+    	
+    	for t in self.triangles:
     		p1 = self.toCanvasCoords(t.p1)
     		p2 = self.toCanvasCoords(t.p2)
     		p3 = self.toCanvasCoords(t.p3)
+    		inside = False
     		if(self.origTriangle == None or drawOrigLines or (t.p1 not in origPointSet and t.p2 not in origPointSet)):
     			w.create_line(p1[0],p1[1],p2[0],p2[1])
+    			inside = True
+    		else:
+    			inside = False
     		if(self.origTriangle == None or drawOrigLines or (t.p2 not in origPointSet and t.p3 not in origPointSet)):
     			w.create_line(p2[0],p2[1],p3[0],p3[1])
+    			inside = True
+    		else:
+    			inside = False
     		if(self.origTriangle == None or drawOrigLines or (t.p3 not in origPointSet and t.p1 not in origPointSet)):
     			w.create_line(p3[0],p3[1],p1[0],p1[1])
+    			inside = True
+    		else:
+    			inside = False
+    		if(inside and drawCircs):
+    			center = circumcenter(p1,p2,p3)
+    			radius = distance(center,p1)
+    			w.create_oval(center[0]-radius,center[1]-radius,center[0]+radius,center[1]+radius, outline='blue')
     		#print(p1[0],p1[1],p2[0],p2[1])
     		#print(p2[0],p2[1],p3[0],p3[1])
     		#print(p3[0],p3[1],p1[0],p1[1])

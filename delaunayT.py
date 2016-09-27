@@ -43,8 +43,8 @@ class DelaunayT(Triangulation):
         # insert points into the triangulation
         for p in points:
             self.insertPoint(p)
-            #self.draw(True)
-        self.draw(False)
+            #self.draw(False)
+        self.draw(False,False)
 
     ' POINT -> TRIANGLE '
     ' Find the triangle that contain a point in a triangulation'
@@ -61,7 +61,7 @@ class DelaunayT(Triangulation):
     ' POINT -> VOID'
     ' Adds a point to the triangulation'
     def insertPoint(self, point):
-        eps = 0.00001
+        eps = 0.0001
         #print("Inserting now point: " + point.show())
         if self.triangles:
             t = self.findTriangle(point,eps)
